@@ -104,29 +104,6 @@ def register_user(username: str, password: str, email: str) -> str:
 
     return result, message
 
-# def login_user(username: str, password: str) -> bool:
-#     """
-#     Log in a user with the given username and password.
-    
-#     Args:
-#         username (str): The username of the user.
-#         password (str): The password of the user.
-    
-#     Returns:
-#         bool: True if login is successful, False otherwise.
-#     """
-#     # Placeholder for actual login logic
-#     conn = get_connection()
-#     c = conn.cursor()
-#     c.execute("SELECT password FROM users WHERE username = ?", (username,))
-#     result = c.fetchone()
-#     conn.close()
-#     if result is None or result[0] != password:
-#         return False  # Invalid username or password
-#     # If the password matches, login is successful
-#     print(f"[LOG] User {username} logged in successfully.")
-#     return True
-
 def login_user(username: str, password: str):
     """
     Attempts to log in a user.

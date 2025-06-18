@@ -24,12 +24,15 @@ if st.session_state.is_logged_in:
     st.write("Đây là trang thông tin của bạn.")
     st.sidebar.title(f"Xin chào {st.session_state.username}!")
 
-    if st.button("Đăng xuất", use_container_width=True):
+    if st.button("Đăng xuất", use_container_width=True, icon="🚪"):
         st.session_state.is_logged_in = False
         print(f"[LOG] User {st.session_state.username} logged out successfully.")
         st.session_state.username = None
         st.session_state.user_id = None
-        #st.rerun()
+        # show thông báo là đang đăng xuất cho người dùng
+        st.success("Đang đăng xuất khỏi tài khoản của bạn...")
+        time.sleep(1.5)
+        st.rerun()
 
 # --- Nếu chưa đăng nhập ---
 else:
@@ -37,11 +40,11 @@ else:
 
     col1, col2 = st.columns([1, 1])
     with col1:
-        if st.button("Đăng ký", use_container_width=True):
+        if st.button("Đăng ký", use_container_width=True, icon="📝"):
             st.session_state.show_register_form = True
             st.session_state.show_login_form = False
     with col2:
-        if st.button("Đăng nhập", use_container_width=True):
+        if st.button("Đăng nhập", use_container_width=True, icon="🔐"):
             st.session_state.show_login_form = True
             st.session_state.show_register_form = False
 
@@ -62,7 +65,7 @@ else:
                         st.success("Đăng ký thành công! Vui lòng đăng nhập tài khoản của bạn.")
                         st.session_state.show_register_form = False
                         st.session_state.show_login_form = True
-                        time.sleep(2)
+                        time.sleep(1.5)
                         st.rerun()
                     else:
                         st.error(msg)
@@ -85,7 +88,7 @@ else:
                         st.session_state.username = username
                         st.session_state.user_id = msg
                         st.session_state.show_login_form = False
-                        time.sleep(2)
+                        time.sleep(1.5)
                         st.rerun()
                     else:
                         st.error(msg)
