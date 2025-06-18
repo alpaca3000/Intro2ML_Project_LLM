@@ -82,25 +82,26 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 - So sánh bản dịch của bạn với bản dịch của hệ thống
 
 ## Cấu trúc project
-
-Envichan/
-├── Home.py                   # Trang chủ
-├── pages/                    # Các trang trong ứng dụng
-│   ├── My_account.py         # Quản lý tài khoản
-│   ├── My_dictionary.py      # Từ điển cá nhân
-│   ├── My_flashcard.py       # Quản lý flashcard
-│   └── Translate_evalution.py # Đánh giá dịch thuật
-├── services/                 # Các dịch vụ của ứng dụng
-│   ├── auth.py               # Xác thực người dùng
-│   ├── flashcard.py          # Quản lý flashcard
-│   ├── translate.py          # Dịch thuật
-│   └── vocab.py              # Quản lý từ vựng
-├── components/               # Thành phần UI
-│   └── flashcard_ui.py       # Giao diện flashcard
-├── databases/                # Cơ sở dữ liệu
-│   ├── database.db           # File SQLite
-│   └── init_db.py            # Khởi tạo DB
-├── utils/                    # Tiện ích
-│   ├── model_storage.py      # Lưu trữ mô hình
-│   └── session.py            # Quản lý phiên
-└── requirements.txt          # Thư viện cần thiết
+```
+    Envichan/
+    ├── Home.py                   # Trang chủ
+    ├── pages/                    # Các trang trong ứng dụng
+    │   ├── My_account.py         # Quản lý tài khoản
+    │   ├── My_dictionary.py      # Từ điển cá nhân
+    │   ├── My_flashcard.py       # Quản lý flashcard
+    │   └── Translate_evalution.py # Đánh giá dịch thuật
+    ├── services/                 # Các dịch vụ của ứng dụng
+    │   ├── auth.py               # Xác thực người dùng
+    │   ├── flashcard.py          # Quản lý flashcard
+    │   ├── translate.py          # Dịch thuật
+    │   └── vocab.py              # Quản lý từ vựng
+    ├── components/               # Thành phần UI
+    │   └── flashcard_ui.py       # Giao diện flashcard
+    ├── databases/                # Cơ sở dữ liệu
+    │   ├── database.db           # File SQLite
+    │   └── init_db.py            # Khởi tạo DB
+    ├── utils/                    # Tiện ích
+    │   ├── model_storage.py      # Lưu trữ mô hình
+    │   └── session.py            # Quản lý phiên
+    └── requirements.txt          # Thư viện cần thiết
+```
