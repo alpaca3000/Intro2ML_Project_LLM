@@ -51,42 +51,38 @@ selected_row = vocabulary_table["selected_rows"]
 
 # when 1 row is selected, show edit and delete buttons
 if selected_row is not None:
-    vocab = selected_row
-
     # Hiển thị thông tin chi tiết từ
-    st.markdown(f"### Từ vựng: **{vocab['en'].values[0]}**")
-    st.markdown(f"- **Nghĩa tiếng Việt:** {vocab['vi'].values[0]}")
-    st.markdown(f"- **Loại từ:** {vocab['class'].values[0]}")
-    st.markdown(f"- **Ví dụ tiếng Anh:** {vocab['example_en'].values[0]}")
-    st.markdown(f"- **Ví dụ tiếng Việt:** {vocab['example_vi'].values[0]}")
-    st.markdown(f"- **Trạng thái:** {vocab['status'].values[0]}")
+    st.markdown(f"### Từ vựng: **{selected_row['en'].values[0]}**")
+    st.markdown(f"- **Nghĩa tiếng Việt:** {selected_row['vi'].values[0]}")
+    st.markdown(f"- **Loại từ:** {selected_row['class'].values[0]}")
+    st.markdown(f"- **Ví dụ tiếng Anh:** {selected_row['example_en'].values[0]}")
+    st.markdown(f"- **Ví dụ tiếng Việt:** {selected_row['example_vi'].values[0]}")
+    st.markdown(f"- **Trạng thái:** {selected_row['status'].values[0]}")
 
-    # Nếu không trong chế độ chỉnh sửa hoặc xóa thì mới hiển thị nút
-    if st.session_state.editing_id is None and st.session_state.deleting_id is None:
-        left_blank_col, col1, col2, right_blank_col = st.columns([1,1,1, 1])
-        with col1:
-            if st.button("Chỉnh sửa", use_container_width=True, icon="✏️"):
-                st.session_state.editing_id = vocab["vocab_id"].values[0]
-        with col2:
-            if st.button("Xóa", use_container_width=True, icon="🗑️"):
-                st.session_state.deleting_id = vocab["vocab_id"].values[0]
+left_blank_col, col1, col2, right_blank_col = st.columns([1,1,1, 1])
+with col1:
+    if st.button("Chỉnh sửa", use_container_width=True, icon="✏️", disabled=(selected_row is None)):
+        st.session_state.editing_id = selected_row["vocab_id"].values[0]
+with col2:
+    if st.button("Xóa", use_container_width=True, icon="🗑️", disabled=(selected_row is None)):
+        st.session_state.deleting_id = selected_row["vocab_id"].values[0]
 
 # Nếu đang chỉnh sửa
 if st.session_state.editing_id is not None:
     st.markdown("### Cập nhật từ vựng")
     with st.form("edit_form"):
-        new_vi = st.text_input("Nghĩa tiếng Việt", value=vocab["vi"].values[0])
+        new_vi = st.text_input("Nghĩa tiếng Việt", value=selected_row["vi"].values[0])
         new_class = st.selectbox(
             "Loại từ",
             options=["Danh từ", "Động từ", "Tính từ", "Trạng từ"],
-            index=["Danh từ", "Động từ", "Tính từ", "Trạng từ"].index(vocab["class"].values[0])
+            index=["Danh từ", "Động từ", "Tính từ", "Trạng từ"].index(selected_row["class"].values[0])
         )
-        new_example_en = st.text_area("Ví dụ tiếng Anh", value=vocab["example_en"].values[0])
-        new_example_vi = st.text_area("Ví dụ tiếng Việt", value=vocab["example_vi"].values[0])
+        new_example_en = st.text_area("Ví dụ tiếng Anh", value=selected_row["example_en"].values[0])
+        new_example_vi = st.text_area("Ví dụ tiếng Việt", value=selected_row["example_vi"].values[0])
         new_status = st.selectbox(
             "Trạng thái",
             options=["Đang học", "Đã nhớ"],
-            index=["Đang học", "Đã nhớ"].index(vocab["status"].values[0])
+            index=["Đang học", "Đã nhớ"].index(selected_row["status"].values[0])
         )
 
         left_blank_col, col_save, col_cancel, right_blank_col = st.columns([1, 1, 1, 1])
@@ -123,7 +119,7 @@ if st.session_state.deleting_id is not None:
     left_blank_col1, col_confirm, col_cancel, right_blank_col1 = st.columns([1, 1, 1, 1])
     with col_confirm:
         if st.button("Xác nhận xóa", use_container_width=True, icon="✅"):
-            result, message = delete_vocab(vocab["vocab_id"].values[0])
+            result, message = delete_vocab(selected_row["vocab_id"].values[0])
             if result:
                 st.toast("Đã xóa từ vựng thành công!", icon="🗑️")
             else:
