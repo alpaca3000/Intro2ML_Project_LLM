@@ -75,12 +75,12 @@ with remove_col:
 
 # if deleting flashcard button is clicked, show confirmation dialog
 if st.session_state.deleting_flashcard_id is not None:
-    st.warning("Bạn có chắc muốn xóa bộ đề này? Hành động này không thể hoàn tác.")
+    st.warning("⚠️ Bạn có chắc muốn xóa bộ đề này? Hành động này không thể hoàn tác.")
     # Hiển thị hộp thoại xác nhận xóa hoặc hủy
     
     left_blank_col1, col_confirm, col_cancel, right_blank_col1 = st.columns([1, 1, 1, 1])
     with col_confirm:
-        if st.button("Xác nhận xóa", use_container_width=True, icon="✔"):  # tích xanh
+        if st.button("Xác nhận xóa", use_container_width=True, icon="✅"):  # tích xanh
             result, message = delete_flashcard(st.session_state.deleting_flashcard_id)
             if result:
                 st.toast("Đã xóa bộ đề thành công!", icon="🗑️")

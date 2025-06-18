@@ -55,7 +55,7 @@ else:
             username = st.text_input("Tên người dùng")
             email = st.text_input("Email")
             password = st.text_input("Mật khẩu", type="password")
-            submit = st.form_submit_button("Đăng ký", use_container_width=True)
+            submit = st.form_submit_button("Đăng ký", use_container_width=True, icon="📝")
             if submit:
                 if not username or not email or not password:
                     st.warning("Vui lòng điền đầy đủ thông tin.")
@@ -76,7 +76,7 @@ else:
             st.subheader("Thông tin đăng nhập")
             username = st.text_input("Tên người dùng")
             password = st.text_input("Mật khẩu", type="password")
-            submit = st.form_submit_button("Đăng nhập", use_container_width=True)
+            submit = st.form_submit_button("Đăng nhập", use_container_width=True, icon="🔑")
             if submit:
                 if not username or not password:
                     st.warning("Vui lòng điền đầy đủ thông tin.")
