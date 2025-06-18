@@ -40,7 +40,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
    pip install -r requirement.txt
    ```
 
-3. Khởi tạo cơ sở dữ liệu
+3. Khởi tạo cơ sở dữ liệu (bỏ qua nếu đã có, trong đồ án xài db local nên có rồi)
    ```bash
    cd databases
    python init_db.py
@@ -71,9 +71,10 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 
 - Xem danh sách từ vựng đã lưu
 - Chỉnh sửa hoặc xóa từ vựng
-- Flashcard của tôi:
 
-4. Tạo bộ flashcard mới từ từ vựng đã lưu
+4. Flashcard của tôi:
+
+- Tạo bộ flashcard mới từ từ vựng đã lưu
 - Luyện tập với các bộ flashcard
 
 5. Đánh giá dịch thuật:
