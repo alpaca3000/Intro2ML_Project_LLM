@@ -2,36 +2,43 @@ import json
 import pandas as pd
 from datetime import datetime
 import uuid
-import sqlite3
 import random
+from databases.connection import get_connection
 
-def get_user_flashcards(user_id: int):
+def get_user_flashcards(user_id: int) -> pd.DataFrame:
     """
-    Retrieves all tests created by a specific user.
+    Lấy danh sách flashcards của người dùng từ PostgreSQL (Neon).
     
     Args:
-        user_id (int): The ID of the user whose tests are to be retrieved.
-    
+        user_id (int): ID người dùng.
+
     Returns:
-        list: A list of tests created by the user.
+        pd.DataFrame: DataFrame chứa thông tin flashcards.
     """
+    conn = None
     try:
-        conn = sqlite3.connect("databases/database.db")
-        df = pd.read_sql_query(
-            """
+        conn = get_connection()
+        cur = conn.cursor()
+
+        query = """
             SELECT test_id, name, status, score, date_updated
             FROM flashcards
-            WHERE user_id = ?
+            WHERE user_id = %s
             ORDER BY date_updated DESC
-            """,
-            conn,
-            params=(user_id,)
-        )
-        conn.close()
+        """
+        cur.execute(query, (user_id,))
+        rows = cur.fetchall()
+        colnames = [desc[0] for desc in cur.description]
+
+        df = pd.DataFrame(rows, columns=colnames)
         return df
+
     except Exception as e:
-        print("Lỗi khi truy vấn flashcards:", e)
+        print(f"[get_user_flashcards] Lỗi: {e}")
         return pd.DataFrame()
+    finally:
+        if conn:
+            conn.close()
     
 
 def create_flashcard(user_id: int, test_name: str, vocabs_json: str):
@@ -46,18 +53,18 @@ def create_flashcard(user_id: int, test_name: str, vocabs_json: str):
     # init test_id, date_updated, status, score
     test_id = str(uuid.uuid4())
     date_updated = datetime.now().date().isoformat()
-    status = 'chưa làm'
+    status = 'Chưa làm'
     score = 0.0
 
     # connect to the database and insert the new test
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     try:
         c.execute("""
             INSERT INTO flashcards (test_id, user_id, name, status, score, date_updated, vocabs)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (test_id, user_id, test_name, status, score, date_updated, vocabs_json))
-    except sqlite3.IntegrityError as e:
+    except psycopg2.IntegrityError as e:
         print(f"[LOG] Error creating flashcard: {e}")
         conn.close()
         return False, str(e)
@@ -73,11 +80,11 @@ def delete_flashcard(test_id: int):
     Args:
         test_id (int): The ID of the test to be deleted.
     """
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     try: 
-        c.execute("DELETE FROM flashcards WHERE test_id = ?", (test_id,))
-    except sqlite3.Error as e:
+        c.execute("DELETE FROM flashcards WHERE test_id = %s", (test_id,))
+    except psycopg2.Error as e:
         print(f"[LOG] Error deleting flashcard: {e}")
         conn.close()
         return False, str(e)
@@ -96,15 +103,15 @@ def get_flashcard_test(test_id: str):
     Returns:
         dict: Test details including words
     """
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     try:
-        c.execute("SELECT name, vocabs FROM flashcards WHERE test_id = ?", (test_id,))
+        c.execute("SELECT name, vocabs FROM flashcards WHERE test_id = %s", (test_id,))
         result = c.fetchone()
         conn.close()
         
         if result:
-            test_name, vocabs_json = result
+            test_name, vocabs_json = result["name"], result["vocabs"]
             return {
                 "test_id": test_id,
                 "name": test_name,
@@ -127,16 +134,16 @@ def update_flashcard_score(test_id: str, score: float):
     Returns:
         bool: True if successful, False otherwise
     """
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     date_updated = datetime.now().date().isoformat()
-    status = 'đã làm'
+    status = 'Đã làm'
     
     try:
         c.execute("""
             UPDATE flashcards 
-            SET score = ?, status = ?, date_updated = ?
-            WHERE test_id = ?
+            SET score = %s, status = %s, date_updated = %s
+            WHERE test_id = %s
         """, (score, status, date_updated, test_id))
         conn.commit()
         conn.close()

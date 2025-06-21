@@ -1,6 +1,7 @@
 import sqlite3
 import uuid
 from datetime import datetime
+from databases.connection import get_connection
 
 # add new vocabulary to user's vocabulary list
 def add_vocab(user_id: str, en: str, vi: str, word_class: str, example_en: str, example_vi: str, status: str = "Đang học"):
@@ -21,14 +22,14 @@ def add_vocab(user_id: str, en: str, vi: str, word_class: str, example_en: str, 
     date_created = datetime.now().date().isoformat()
     
     # connect to the database
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
 
     result = True
     message = vocab_id
 
     # check if this word already exists in the user's vocabulary by en and vi
-    c.execute("SELECT * FROM vocabulary WHERE user_id = ? AND en = ? AND vi = ?", (user_id, en, vi))
+    c.execute("SELECT * FROM vocabulary WHERE user_id = %s AND en = %s AND vi = %s", (user_id, en, vi))
     existing_vocab = c.fetchone()
 
     if existing_vocab:
@@ -41,7 +42,7 @@ def add_vocab(user_id: str, en: str, vi: str, word_class: str, example_en: str, 
         try:
             c.execute("""
                 INSERT INTO vocabulary (vocab_id, user_id, en, vi, class, example_en, example_vi, status, date_added)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (vocab_id, user_id, en, vi, word_class, example_en, example_vi, status, date_created))
         except sqlite3.IntegrityError as e:
             message = e
@@ -65,10 +66,10 @@ def get_user_vocabulary(user_id: str):
         list: A list of vocabulary entries for the user.
     """
     
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     
-    c.execute("SELECT * FROM vocabulary WHERE user_id = ?", (user_id,))
+    c.execute("SELECT * FROM vocabulary WHERE user_id = %s", (user_id,))
     results = c.fetchall()
     
     conn.close()
@@ -84,10 +85,10 @@ def delete_vocab(vocab_id: str):
         vocab_id (str): The ID of the vocabulary to be deleted.
     """
     
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     try:
-        c.execute("DELETE FROM vocabulary WHERE vocab_id = ?", (vocab_id,))
+        c.execute("DELETE FROM vocabulary WHERE vocab_id = %s", (vocab_id,))
     except sqlite3.Error as e:
         print(f"[LOG] Error deleting vocabulary: {e}")
         conn.close()
@@ -110,10 +111,10 @@ def update_vocab_status(vocab_id: str, new_status: str):
         status (str): The new status to set for the vocabulary.
     """
     
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     
-    c.execute("UPDATE vocabulary SET status = ? WHERE vocab_id = ?", (new_status, vocab_id))
+    c.execute("UPDATE vocabulary SET status = %s WHERE vocab_id = %s", (new_status, vocab_id))
     
     conn.commit()
     conn.close()
@@ -135,14 +136,14 @@ def update_vocab(vocab_id: str, new_meaning, new_class, new_example_en: str, new
     """
     date_updated = datetime.now().date().isoformat()
     
-    conn = sqlite3.connect("databases/database.db")
+    conn = get_connection()
     c = conn.cursor()
     
     try:
         c.execute("""
             UPDATE vocabulary 
-            SET vi = ?, class = ?, example_en = ?, example_vi = ?, status = ?, date_added = ? 
-            WHERE vocab_id = ?
+            SET vi = %s, class = %s, example_en = %s, example_vi = %s, status = %s, date_added = %s 
+            WHERE vocab_id = %s
         """, (new_meaning, new_class, new_example_en, new_example_vi, new_status,date_updated, vocab_id))
     except sqlite3.IntegrityError as e:
         print(f"[LOG] Error updating vocabulary: {e}")
