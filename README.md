@@ -39,14 +39,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
    pip install -r requirement.txt
    ```
 
-3. Khởi tạo cơ sở dữ liệu (bỏ qua nếu đã có, trong đồ án xài db local nên có rồi)
-   ```bash
-   cd databases
-   python init_db.py
-   cd ..
-   ```
-
-4. Chạy ứng dụng
+3. Chạy ứng dụng
    ```bash
    streamlit run Home.py
    ``` 
@@ -81,7 +74,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 - Thực hành dịch văn bản và nhận đánh giá
 - So sánh bản dịch của bạn với bản dịch của hệ thống
 
-## Cấu trúc project
+## 🗂️ Cấu trúc project
 ```
     Envichan/
     ├── Home.py                   # Trang chủ
