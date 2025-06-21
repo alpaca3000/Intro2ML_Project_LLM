@@ -24,8 +24,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 
 ### Yêu cầu hệ thống
 
-- Python 3.8+
-- SQLite
+- Python 3.11
 
 ### Cài đặt
 
@@ -98,11 +97,10 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
     │   └── vocab.py              # Quản lý từ vựng
     ├── components/               # Thành phần UI
     │   └── flashcard_ui.py       # Giao diện flashcard
-    ├── databases/                # Cơ sở dữ liệu
-    │   ├── database.db           # File SQLite
-    │   └── init_db.py            # Khởi tạo DB
+    ├── databases/ 
+    │   └── connection.py         # Kết nối DB
     ├── utils/                    # Tiện ích
-    │   ├── model_storage.py      # Lưu trữ mô hình
+    │   ├── password.py           # Mã hóa password
     │   └── session.py            # Quản lý phiên
     └── requirements.txt          # Thư viện cần thiết
 ```
