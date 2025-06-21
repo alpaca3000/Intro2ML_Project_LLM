@@ -37,7 +37,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 
 2. Cài đặt các thư viện cần thiết
    ```bash
-   pip install -r requirement.txt
+   pip install -r requirements.txt
    ```
 
 3. Khởi tạo cơ sở dữ liệu (bỏ qua nếu đã có, trong đồ án xài db local nên có rồi)
