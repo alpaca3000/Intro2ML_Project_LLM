@@ -2,20 +2,10 @@ import nltk
 from nltk.corpus import wordnet
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from services.translate import translate_text, load_translation_model
 # Download required NLTK data
 nltk.download('wordnet')
-def load_translation_model():
-    """
-    Loads a pre-trained translation model and tokenizer.
-    returns:
-        tokenizer: The tokenizer for the translation model.
-        model: The pre-trained translation model.
-    """
-    model_path = "alpaca3000/en-vi-translation-model"
-    #model_path = "models/my_en_vi_translation_model_archive"
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
-    return tokenizer, model
+
 # Additional functions for get_word_info function
 def transfer_part_of_speech(pos):
     if pos == "n":
@@ -28,15 +18,7 @@ def transfer_part_of_speech(pos):
         return "Trạng từ"
     elif pos == "s":
         return "Đại từ"
-def translate_word(word):
-    tokenizer, model = load_translation_model()
-    input = tokenizer(word, return_tensors="pt", padding=True, truncation=True, max_length=128)
 
-    with torch.no_grad():
-        outputs = model.generate(**input, max_length=128, num_beams=5, early_stopping=True)
-            
-    translation = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return translation
 def upper_first_letter(word):
     return word[0].upper() + word[1:]
 # Get information of a word
@@ -50,7 +32,7 @@ def get_word_info(word):
         # Get definitions
         info = {}
         definition = synset.definition()
-        translation = translate_word(definition)
+        translation = translate_text(definition)
         translation = upper_first_letter(translation)
         info['definition'] = translation
         

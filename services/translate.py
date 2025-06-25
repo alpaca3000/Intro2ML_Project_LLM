@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 import streamlit as st
 
-@st.cache_resource
+@st.cache_resource(show_spinner="Đang tải mô hình dịch thuật...")
 def load_translation_model():
     """
     Loads a pre-trained translation model and tokenizer.
@@ -14,6 +14,7 @@ def load_translation_model():
     #model_path = "models/my_en_vi_translation_model_archive"
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+    model.eval()  # Set the model to evaluation mode
     return tokenizer, model
 
 def translate_text(text: str) -> str:
@@ -28,7 +29,7 @@ def translate_text(text: str) -> str:
 
     inputs = tokenizer(text, return_tensors="pt")
     with torch.no_grad():
-        outputs = model.generate(**inputs)
+        outputs = model.generate(**inputs, max_length=128, num_beams=5, early_stopping=True)
     
     translated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return translated_text
