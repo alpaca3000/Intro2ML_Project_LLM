@@ -3,82 +3,62 @@ from services.translate import translate_text
 from services.vocab import add_vocab
 from utils.session import is_logged_in
 from services.translate import load_translation_model
+from services.word_info import get_word_info
 
-# tokenizer, model = load_translation_model()
+tokenizer, model = load_translation_model()
 
-# # giới thiệu về trang web envichan
-# st.title("Chào mừng đến với Envichan!")
-# st.write("Envichan là một ứng dụng học tiếng Anh trực tuyến, nơi bạn có thể học từ vựng, ngữ pháp và thực hành giao tiếp.")
+# Giới thiệu về trang web envichan
+st.title("Chào mừng đến với Envichan!")
+st.write("Envichan là một ứng dụng học tiếng Anh trực tuyến, nơi bạn có thể học từ vựng, ngữ pháp và thực hành giao tiếp.")
 
-# # hiển thị phần dịch tiếng Anh sang tiếng Việt
-# st.subheader("Dịch tiếng Anh sang tiếng Việt")
-# text = st.text_area("Nhập nội dung tiếng Anh:")
-# blank_col, translate_col = st.columns([4, 1])
-# with translate_col:
-#     translate = st.button("Dịch", use_container_width=True)
+# Hiển thị phần dịch tiếng Anh sang tiếng Việt
+st.subheader("Dịch tiếng Anh sang tiếng Việt")
+text = st.text_area("Nhập nội dung tiếng Anh:")
+blank_col, translate_col = st.columns([4, 1])
+with translate_col:
+    translate = st.button("Dịch", use_container_width=True)
         
-# if translate: 
-#     result = translate_text(text)
-#     st.success(result)
+if translate: 
+    result = translate_text(text)
+    st.success(result)
 
-# # hiển thị phần thêm từ vựng
-# st.subheader("Thêm từ vựng vào từ điển của bạn?")
-# # kiểm tra xem người dùng đã đăng nhập hay chưa
-# if not is_logged_in():
-#     st.warning("Bạn cần đăng nhập để thực hiện chức năng này.")
-# else:
-#     st.sidebar.title(f"Xin chào {st.session_state.username}!")
-#     with st.expander("Nhập thông tin từ vựng mới"):
-#         with st.form("add_vocab_form", clear_on_submit=True):
-#             en = st.text_input("Từ tiếng Anh", key="en_input")
-#             vi = st.text_input("Nghĩa tiếng Việt", key="vi_input")
-#             word_class = st.selectbox("Loại từ", ["Danh từ", "Động từ", "Tính từ", "Trạng từ"], key="word_class_input")
-#             example_en = st.text_input("Ví dụ tiếng Anh", key="ex_input")
-#             example_vi = translate_text(example_en) if example_en else ""
-#             status = st.selectbox("Trạng thái", ["Đang học", "Đã nhớ"], key="status_input")
-            
-#             # 2 nút thêm và hủy
-#             left_blank_col, col1, col2, right_blank_col = st.columns([1, 1, 1, 1])
-#             with col1:
-#                 submit = st.form_submit_button("Thêm", use_container_width=True, type="secondary", icon="➕")
-#             with col2:
-#                 cancel = st.form_submit_button("Hủy", use_container_width=True, type="secondary", icon="❌")
+# Hiển thị phần tra cứu từ vựng mới
+st.subheader("Phát hiện từ vựng mới ? Tra cứu ngay!")
+word_to_lookup = st.text_input("Nhập từ tiếng Anh cần tra cứu:", key="word_lookup_input", placeholder="Ví dụ: friendly, beautiful, etc.")
 
-#             # kiểm tra trường thông tin chưa nhập
-#             if submit:
-#                 if not en or not vi or not word_class or not example_en:
-#                     st.error("Vui lòng điền đầy đủ thông tin.")
-#                 else:
-#                     # thêm từ vựng vào cơ sở dữ liệu
-#                     result, msg = add_vocab(st.session_state["user_id"], en, vi, word_class, example_en, example_vi, status)
-#                     if result:
-#                         st.toast(f"Đã thêm {en} vào từ điển của bạn!", icon="✅")
-#                     else:
-#                         st.error(f"Lỗi: {msg}")
-#             if cancel:
-#                 st.rerun()
+if word_to_lookup:
+    word_info = get_word_info(word_to_lookup)
+    if word_info:
+        st.write(f"Kết quả tra cứu cho: **{word_to_lookup}**")
+        for idx, info in enumerate(word_info):
+            part_of_speech = info.get('part_of_speech', 'Không rõ')
+            definition = info['definition']
+            examples = info.get('examples', [])
+            synonyms = ', '.join(info['synonyms']) if info.get('synonyms') else 'Không có từ đồng nghĩa'
 
-from st_click_detector import click_detector
+            with st.expander(f"Định nghĩa {idx+1}: {info['definition']}"):
+                st.markdown(f"**Loại từ:** `{part_of_speech}`")                
+                
+                st.markdown(f"**Định nghĩa:** {definition}")
 
-st.title("Demo: Click từng từ trong câu")
+                if info.get('examples'):
+                    st.markdown("**Ví dụ:**")
+                    for example in info['examples']:
+                        st.markdown(f"- _{example}_")
 
-sentence = "Streamlit is a powerful and easy-to-use tool for building interactive data apps."
-words = sentence.split()
+                st.markdown(f"**Từ đồng nghĩa:** {synonyms}")
 
-# Tạo HTML: mỗi từ là link với id riêng
-html = "<div style='display:flex; flex-wrap:wrap; gap:8px'>\n"
-for i, w in enumerate(words):
-    html += f'<a href="#" id="word_{i}" style="text-decoration:none; color:#262730; background:#f0f2f6; padding:4px 8px; border-radius:6px;">{w}</a>\n'
-html += "</div>"
-
-# Gọi component để hiển thị và bắt click
-clicked_id = click_detector(html, key="word_click")
-
-# Xử lý kết quả click
-if clicked_id:
-    # Lấy chỉ số từ từ id
-    idx = int(clicked_id.split("_")[1])
-    clicked_word = words[idx]
-    st.success(f"✅ Bạn đã click vào từ: **{clicked_word}** (id: {clicked_id})")
-else:
-    st.write("📌 Nhấn vào một từ để xem hiệu ứng.")
+                if st.button(f"➕ Thêm định nghĩa {idx+1} vào từ điển", key=f"add_def_{idx}", use_container_width=True):
+                    # check xem người dùng đã đăng nhập chưa
+                    if not is_logged_in():
+                        st.warning("Bạn cần đăng nhập để thực hiện chức năng này.")
+                        
+                    else:
+                        user_id = st.session_state.get("user_id")
+                        result, message = add_vocab(user_id, word_to_lookup, definition, part_of_speech, examples, synonyms)
+                        if result:
+                            st.toast(f"✅ Đã thêm từ vựng '{word_to_lookup}' vào từ điển của bạn!")
+                        else: 
+                            st.error(f"❌ Lỗi: {message}")
+    else:
+        st.error("Không tìm thấy thông tin cho từ này. Vui lòng thử lại với từ khác.")
