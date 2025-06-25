@@ -36,7 +36,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 
 2. Cài đặt các thư viện cần thiết
    ```bash
-   pip install -r requirement.txt
+   pip install -r requirements.txt
    ```
 
 3. Chạy ứng dụng

@@ -9,6 +9,8 @@ streamlit-aggrid==1.1.5.post1
 dotenv==0.9.9
 bcrypt==4.3.0
 torch==2.7.1
+tornado==6.5.1
+tqdm==4.67.1
 transformers==4.52.4
 streamlit-js-eval==0.1.7
 st_click_detector==0.1.3
