@@ -3,6 +3,7 @@ from nltk.corpus import wordnet
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from services.translate import translate_text, load_translation_model
+import streamlit as st
 # Download required NLTK data
 nltk.download('wordnet')
 
@@ -22,6 +23,7 @@ def transfer_part_of_speech(pos):
 def upper_first_letter(word):
     return word[0].upper() + word[1:]
 # Get information of a word
+@st.cache_data(show_spinner=False)
 def get_word_info(word):
     synsets = wordnet.synsets(word)
     if not synsets:
