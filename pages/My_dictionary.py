@@ -46,11 +46,28 @@ vocabulary_table = AgGrid(
     gridOptions=gb_vocabulary.build(),
     update_mode=GridUpdateMode.SELECTION_CHANGED,
     fit_columns_on_grid_load=True,
-    height=min(300, (len(vocabulary_df) + 2) * 32 + 32)
+    height=min(300, (len(vocabulary_df) + 2) * 32 + 32),
+    key="vocabulary_table"
 )
 
 # get selected word
 selected_row = vocabulary_table["selected_rows"]
+
+status_modal = Modal("Cập nhật trạng thái", key="update_status_modal", max_width=500)
+delete_modal = Modal("Xóa từ vựng", key="delete_vocab_modal", max_width=500)
+
+def update_vocab_status_callback():
+    """Callback function to update vocabulary status."""
+    vocab_id = selected_row["vocab_id"].values[0]
+    new_status = "Đã nhớ" if selected_row["status"].values[0] == "Đang học" else "Đang học"
+    result, message = update_vocab_status(vocab_id, new_status)
+    return result, message
+
+def delete_vocab_callback():
+    """Callback function to delete vocabulary."""
+    vocab_id = selected_row["vocab_id"].values[0]
+    result, message = delete_vocab(vocab_id)
+    return result, message
 
 # when 1 row is selected, show edit and delete buttons
 if selected_row is not None:
@@ -70,38 +87,13 @@ if selected_row is not None:
         st.markdown("- **Ví dụ:** Không có ví dụ nào được cung cấp.")
     st.markdown(f"- **Từ đồng nghĩa:** {selected_row['synonyms'].values[0]}")
 
-def update_vocab_status_callback():
-    """Callback function to update vocabulary status."""
-    vocab_id = selected_row["vocab_id"].values[0]
-    new_status = "Đã nhớ" if selected_row["status"].values[0] == "Đang học" else "Đang học"
-    result, message = update_vocab_status(vocab_id, new_status)
-    return result, message
-
-def delete_vocab_callback():
-    """Callback function to delete vocabulary."""
-    vocab_id = selected_row["vocab_id"].values[0]
-    result, message = delete_vocab(vocab_id)
-    return result, message
-
-status_modal = Modal("Cập nhật trạng thái", key="update_status_modal", max_width=500)
-delete_modal = Modal("Xóa từ vựng", key="delete_vocab_modal", max_width=500)
-
 left_blank_col, col1, col2, right_blank_col = st.columns([1, 2, 2, 1])
 with col1:
-    if st.button(
-        "Cập nhật trạng thái",
-        use_container_width=True,
-        icon="⚠️",
-        disabled=(selected_row is None)
-    ):
+    if st.button("Cập nhật trạng thái", use_container_width=True, icon="⚠️", disabled=(selected_row is None)):
         status_modal.open()   
         
 with col2:
-    if st.button(
-        "🗑️ Xóa từ",
-        use_container_width=True,
-        disabled=(selected_row is None)
-    ):
+    if st.button("🗑️ Xóa từ", use_container_width=True, disabled=(selected_row is None)):
         delete_modal.open()
 
 if status_modal.is_open():
