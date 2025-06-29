@@ -57,8 +57,8 @@ if word_to_lookup:
                         user_id = st.session_state.get("user_id")
                         result, message = add_vocab(user_id, word_to_lookup, definition, part_of_speech, examples, synonyms)
                         if result:
-                            st.toast(f"✅ Đã thêm từ vựng '{word_to_lookup}' vào từ điển của bạn!")
+                            st.toast(f"Đã thêm từ vựng '{word_to_lookup}' vào từ điển của bạn!", icon="✅")
                         else: 
-                            st.error(f"❌ Lỗi: {message}")
+                            st.toast(f"Lỗi: {message}", icon="❌")
     else:
         st.error("Không tìm thấy thông tin cho từ này. Vui lòng thử lại với từ khác.")

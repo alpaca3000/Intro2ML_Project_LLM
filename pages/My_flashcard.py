@@ -123,7 +123,7 @@ if st.session_state.show_create_form:
 
         if submitted:
             if not flashcard_name:
-                st.error("Bạn cần nhập tên bộ đề.")
+                st.warning("Bạn cần nhập tên bộ đề.")
             elif selected_rows is not None:
                 vocabs_json = selected_rows[["vocab_id", "en", "vi"]].to_json(orient="records")
                 result, message = create_flashcard(st.session_state.user_id, flashcard_name, vocabs_json)
@@ -133,9 +133,9 @@ if st.session_state.show_create_form:
                     time.sleep(1)
                     st.rerun()
                 else:
-                    st.error(f"❌ Lỗi: {message}")
+                    st.toast(f"Lỗi: {message}", icon="❌")
             else:
-                st.error("Bạn cần chọn ít nhất một từ để tạo bộ đề.")
+                st.warning("Bạn cần chọn ít nhất một từ để tạo bộ đề.")
 
         if cancel:
             st.session_state.show_create_form = False

@@ -38,10 +38,7 @@ if not st.session_state.show_result:
 # --- Kết quả sau khi đánh giá ---
 if st.session_state.show_result:
     percent = st.session_state.percentage_correct
-    if percent >= 80:
-        st.success(f"✅ Bản dịch của bạn chính xác {percent:.2f}%")
-    else:
-        st.error(f"🚫 Bản dịch của bạn chỉ chính xác {percent:.2f}%.")
+    st.info(f"Bản dịch của bạn chính xác {percent:.2f}%")
 
     # nút đánh giá lại: bạn có muốn thử lại không?
     col_left, col_right = st.columns([3, 1])
