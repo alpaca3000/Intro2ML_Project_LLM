@@ -1,7 +1,24 @@
 import streamlit as st
 import time
 from services.auth import register_user, login_user
-from utils.session import is_logged_in, show_register, show_login, logout
+from utils.session import is_logged_in
+
+# --- Callback Functions cho trang Tài khoản của tôi---
+def show_register():
+    st.session_state.show_register_form = True
+    st.session_state.show_login_form = False
+
+def show_login():
+    st.session_state.show_login_form = True
+    st.session_state.show_register_form = False
+
+def logout():
+    st.session_state.is_logged_in = False
+    st.session_state.username = None
+    st.session_state.user_id = None
+    st.session_state.show_login_form = False
+    st.session_state.show_register_form = False
+    st.toast("Đăng xuất thành công!", icon="✅")
 
 st.title("TÀI KHOẢN CỦA TÔI")
 
