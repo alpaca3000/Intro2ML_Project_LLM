@@ -83,32 +83,26 @@ def delete_vocab_callback():
     result, message = delete_vocab(vocab_id)
     return result, message
 
-def open_status_modal():
-    status_modal.open()
-
-def open_delete_modal():
-    delete_modal.open()
-
 status_modal = Modal("Cập nhật trạng thái", key="update_status_modal", max_width=500)
 delete_modal = Modal("Xóa từ vựng", key="delete_vocab_modal", max_width=500)
 
 left_blank_col, col1, col2, right_blank_col = st.columns([1, 2, 2, 1])
 with col1:
-    st.button(
+    if st.button(
         "Cập nhật trạng thái",
         use_container_width=True,
         icon="⚠️",
-        disabled=(selected_row is None),
-        on_click=open_status_modal
-    )   
+        disabled=(selected_row is None)
+    ):
+        status_modal.open()   
         
 with col2:
-    st.button(
+    if st.button(
         "🗑️ Xóa từ",
         use_container_width=True,
-        disabled=(selected_row is None),
-        on_click=open_delete_modal
-    )
+        disabled=(selected_row is None)
+    ):
+        delete_modal.open()
 
 if status_modal.is_open():
     current_status = selected_row["status"].values[0]

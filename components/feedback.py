@@ -22,14 +22,14 @@ def confirm_modal(
         success, msg = on_confirm_callback()
         st.session_state[f"{session_key}_message"] = msg
         st.session_state[f"{session_key}_success"] = success
-        modal.close()
 
     with modal.container():
         st.markdown(
-            f"<p style='text-align: center'>{message}</p>",
+            f"<p style='font-size: 24px; text-align: center;'>{message}</p>",
             unsafe_allow_html=True
         )
-        st.button(confirm_label, key=f"{session_key}_confirm", use_container_width=True, on_click=confirm_action)
+        if st.button(confirm_label, key=f"{session_key}_confirm", use_container_width=True, on_click=confirm_action):
+            modal.close()
 
 def toast(session_key: str):
     """
