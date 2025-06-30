@@ -38,8 +38,11 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
    ```bash
    pip install -r requirements.txt
    ```
-
-3. Chạy ứng dụng
+3. Cài đặt từ điển WordNet:
+   ```bash
+   python -m nltk.downloader wordnet
+   ```  
+4. Chạy ứng dụng
    ```bash
    streamlit run Home.py
    ``` 
