@@ -4,8 +4,9 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from services.translate import translate_text, load_translation_model
 import streamlit as st
-# Download required NLTK data
-nltk.download('wordnet')
+import re
+
+# nltk.download('wordnet')
 
 # Additional functions for get_word_info function
 def transfer_part_of_speech(pos):
@@ -18,10 +19,29 @@ def transfer_part_of_speech(pos):
     elif pos == "r":
         return "Trạng từ"
     elif pos == "s":
-        return "Đại từ"
+        return "Tính từ ngắn"
 
 def upper_first_letter(word):
-    return word[0].upper() + word[1:]
+    return word[0].upper() + word[1:] if word else word
+
+def standardize_definition_for_translation(definition):
+
+    # 1. (c 563–483 BC) or (c. 563–483 B.C.) → , approximately 563 to 483 before Christ
+    definition = re.sub(
+        r'\(c\.?\s*(\d{3,4})[–-](\d{2,4})\s*[Bb]\.?\s*[Cc]\.?\)',
+        lambda m: f", approximately {m.group(1)} to {m.group(2)} before Christ",
+        definition
+    )
+
+    # 2. 563–483 BC → from 563 to 483 before Christ (if not 'circa')
+    definition = re.sub(
+        r'(?<!circa\s)(?<!from\s)(\d{3,4})[–-](\d{2,4})\s*[Bb]\.?\s*[Cc]\.?',
+        lambda m: f"from {m.group(1)} to {m.group(2)} before Christ",
+        definition
+    )
+    definition = re.sub(r'\b[Bb]\.?\s*[Cc]\.?\b', 'before Christ', definition)
+
+    return definition
 # Get information of a word
 @st.cache_data(show_spinner=False)
 def get_word_info(word):
@@ -34,6 +54,7 @@ def get_word_info(word):
         # Get definitions
         info = {}
         definition = synset.definition()
+        definition = standardize_definition_for_translation(definition)
         translation = translate_text(definition)
         translation = upper_first_letter(translation)
         info['definition'] = translation
@@ -42,12 +63,14 @@ def get_word_info(word):
         info['examples'] = []
         if synset.examples():
             for example in synset.examples():
-                example = upper_first_letter(example)
-                info['examples'].append(example)
+                if word.lower() in example.lower(): 
+                    example = upper_first_letter(example)
+                    info['examples'].append(example)
         
         # Get synonyms
-        synonyms = [lemma.name() for lemma in synset.lemmas() if lemma.name() != word]
+        synonyms = [lemma.name() for lemma in synset.lemmas() if lemma.name().lower() != word.lower()]
         if synonyms:
+            synonyms = [synonym.replace("_", " ") for synonym in synonyms]
             info['synonyms'] = synonyms
         
         # Get part of speech
