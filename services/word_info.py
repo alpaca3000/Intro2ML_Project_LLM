@@ -25,15 +25,13 @@ def upper_first_letter(word):
     return word[0].upper() + word[1:] if word else word
 
 def standardize_definition_for_translation(definition):
-
-    # 1. (c 563–483 BC) or (c. 563–483 B.C.) → , approximately 563 to 483 before Christ
+    # 1. (c 563–483 BC) or (c. 563–483 B.C.) -> , approximately 563 to 483 before Christ
     definition = re.sub(
         r'\(c\.?\s*(\d{3,4})[–-](\d{2,4})\s*[Bb]\.?\s*[Cc]\.?\)',
         lambda m: f", approximately {m.group(1)} to {m.group(2)} before Christ",
         definition
     )
-
-    # 2. 563–483 BC → from 563 to 483 before Christ (if not 'circa')
+    # 2. 563–483 BC -> from 563 to 483 before Christ (if not 'circa')
     definition = re.sub(
         r'(?<!circa\s)(?<!from\s)(\d{3,4})[–-](\d{2,4})\s*[Bb]\.?\s*[Cc]\.?',
         lambda m: f"from {m.group(1)} to {m.group(2)} before Christ",
