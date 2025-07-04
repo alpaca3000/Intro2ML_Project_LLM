@@ -13,10 +13,10 @@ st.write("Envichan là một ứng dụng học tiếng Anh trực tuyến, nơi
 
 # Hiển thị phần dịch tiếng Anh sang tiếng Việt
 st.subheader("Dịch tiếng Anh sang tiếng Việt")
-text = st.text_area("Nhập nội dung tiếng Anh:")
+text = st.text_area("Nhập nội dung tiếng Anh:", placeholder="Ví dụ: Hello, how are you?", key="translate_input")
 blank_col, translate_col = st.columns([4, 1])
 with translate_col:
-    translate = st.button("Dịch", use_container_width=True)
+    translate = st.button("Dịch", use_container_width=True, icon = "🌐")
         
 if translate: 
     result = translate_text(text)
@@ -24,7 +24,7 @@ if translate:
 
 # Hiển thị phần tra cứu từ vựng mới
 st.subheader("Phát hiện từ vựng mới ? Tra cứu ngay!")
-word_to_lookup = st.text_input("Nhập từ tiếng Anh cần tra cứu:", key="word_lookup_input", placeholder="Ví dụ: friendly, beautiful, etc.")
+word_to_lookup = st.text_input("Nhập từ tiếng Anh cần tra cứu:", key="word_lookup_input", placeholder="Ví dụ: map")
 
 if word_to_lookup:
     word_info = get_word_info(word_to_lookup)
@@ -57,8 +57,8 @@ if word_to_lookup:
                         user_id = st.session_state.get("user_id")
                         result, message = add_vocab(user_id, word_to_lookup, definition, part_of_speech, examples, synonyms)
                         if result:
-                            st.toast(f"✅ Đã thêm từ vựng '{word_to_lookup}' vào từ điển của bạn!")
+                            st.toast(f"Đã thêm từ vựng '{word_to_lookup}' vào từ điển của bạn!", icon="✅")
                         else: 
-                            st.error(f"❌ Lỗi: {message}")
+                            st.toast(f"Lỗi: {message}", icon="❌")
     else:
         st.error("Không tìm thấy thông tin cho từ này. Vui lòng thử lại với từ khác.")

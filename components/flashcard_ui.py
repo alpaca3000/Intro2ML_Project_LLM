@@ -53,7 +53,7 @@ def do_flashcard(test_id):
         score = (st.session_state.remembered_count / total_words) * 100
         update_flashcard_score(test_id, score)
         
-        st.success(f"Hoàn thành! Bạn đã ghi nhớ {st.session_state.remembered_count}/{total_words} từ ({score:.1f}%)")
+        st.info(f"Hoàn thành! Bạn đã ghi nhớ {st.session_state.remembered_count}/{total_words} từ ({score:.1f}%)")
         
         # Buttons to restart or returnfg
         pass_col, blank_1, blank_2, fail_col = st.columns([1.5,1,1,1])
