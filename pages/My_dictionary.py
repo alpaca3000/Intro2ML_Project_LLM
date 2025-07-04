@@ -98,7 +98,7 @@ if selected_row is not None:
 
 left_blank_col, col1, col2, right_blank_col = st.columns([1, 2, 2, 1])
 with col1:
-    if st.button("Cập nhật trạng thái", use_container_width=True, icon="⚠️", disabled=(selected_row is None)):
+    if st.button("Cập nhật trạng thái", use_container_width=True, icon="✏️", disabled=(selected_row is None)):
         st.session_state.editing_id = selected_row["vocab_id"].values[0]
         status_modal.open()   
         
