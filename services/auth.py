@@ -106,7 +106,7 @@ def login_user(username: str, password: str):
     user_id_db, password_db = row["user_id"], row["password"]
 
     if not verify_password(password, password_db):
-        message = f"Mật khẩu không đúng: {repr(password_db)}"
+        message = f"Mật khẩu không đúng."
     else:
         result = True
         message = user_id_db
