@@ -95,4 +95,4 @@ else:
                         time.sleep(1)
                         st.rerun()
                     else:
-                        st.error(msg)
+                        st.error(msg, icon="❌")

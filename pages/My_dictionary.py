@@ -6,12 +6,15 @@ from services.translate import translate_text
 from utils.session import is_logged_in
 from components.feedback import confirm_modal, toast
 from streamlit_modal import Modal
+import uuid
 
 # initialize session state for editing and deleting word
 if "editing_id" not in st.session_state:
     st.session_state.editing_id = None
 if "deleting_id" not in st.session_state:
     st.session_state.deleting_id = None
+if "grid_key_vocabulary" not in st.session_state:
+    st.session_state.grid_key_vocabulary = "vocabulary_table"
 
 
 # page title
@@ -47,7 +50,7 @@ vocabulary_table = AgGrid(
     update_mode=GridUpdateMode.SELECTION_CHANGED,
     fit_columns_on_grid_load=True,
     height=min(300, (len(vocabulary_df) + 2) * 32 + 32),
-    key="vocabulary_table"
+    key=st.session_state.grid_key_vocabulary
 )
 
 # get selected word
@@ -61,12 +64,18 @@ def update_vocab_status_callback():
     vocab_id = selected_row["vocab_id"].values[0]
     new_status = "Đã nhớ" if selected_row["status"].values[0] == "Đang học" else "Đang học"
     result, message = update_vocab_status(vocab_id, new_status)
+    if result:
+        st.session_state.grid_key_vocabulary = str(uuid.uuid4())
+        st.editing_id = None
     return result, message
 
 def delete_vocab_callback():
     """Callback function to delete vocabulary."""
     vocab_id = selected_row["vocab_id"].values[0]
     result, message = delete_vocab(vocab_id)
+    if result:
+        st.session_state.grid_key_vocabulary = str(uuid.uuid4())
+        st.session_state.deleting_id = None
     return result, message
 
 # when 1 row is selected, show edit and delete buttons
@@ -89,14 +98,17 @@ if selected_row is not None:
 
 left_blank_col, col1, col2, right_blank_col = st.columns([1, 2, 2, 1])
 with col1:
-    if st.button("Cập nhật trạng thái", use_container_width=True, icon="⚠️", disabled=(selected_row is None)):
+    if st.button("Cập nhật trạng thái", use_container_width=True, icon="✏️", disabled=(selected_row is None)):
+        st.session_state.editing_id = selected_row["vocab_id"].values[0]
         status_modal.open()   
         
 with col2:
     if st.button("🗑️ Xóa từ", use_container_width=True, disabled=(selected_row is None)):
+        st.session_state.deleting_id = selected_row["vocab_id"].values[0]
         delete_modal.open()
 
-if status_modal.is_open():
+if status_modal.is_open() and st.session_state.editing_id is not None:
+    st.session_state.editing_id = None
     current_status = selected_row["status"].values[0]
     new_status = "Đã nhớ" if current_status == "Đang học" else "Đang học"
     confirm_modal(status_modal, 
@@ -111,7 +123,8 @@ if status_modal.is_open():
 
 toast("update_status_modal")
 
-if delete_modal.is_open():
+if delete_modal.is_open() and st.session_state.deleting_id is not None:
+    st.session_state.deleting_id = None
     confirm_modal(delete_modal, 
         message=f"Xác nhận xóa <strong>{selected_row['en'].values[0]}</strong> khỏi từ điển?",
         confirm_label="✔️ Xác nhận",
