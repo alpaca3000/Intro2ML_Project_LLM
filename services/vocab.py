@@ -2,7 +2,8 @@ import json
 import psycopg2
 import streamlit as st
 import uuid
-from datetime import datetime
+import pandas as pd
+from datetime import datetime, timedelta
 from databases.connection import get_connection
 
 # add new vocabulary to user's vocabulary list
@@ -132,39 +133,74 @@ def update_vocab_status(vocab_id: str, new_status: str):
     print(f"[LOG] Vocabulary with ID {vocab_id} updated successfully to status '{new_status}'.")
     return True, "Cập nhật trạng thái từ vựng thành công!"
 
-# # update a vocabulary's details by id
-# def update_vocab(vocab_id: str, new_meaning, new_class, new_examples_en: str, new_examples_vi: str, new_status: str): 
-#     """
-#     Updates the meaning, examples sentences, and status of a vocabulary entry by its ID.
-    
-#     Args:
-#         vocab_id (str): The ID of the vocabulary to be updated.
-#         new_meaning (str): The new meaning of the vocabulary.
-#         new_examples_en (str): The new examples sentence in English.
-#         new_examples_vi (str): The new examples sentence in Vietnamese.
-#         new_status (str): The new status of the vocabulary.
-#     """
-#     date_updated = datetime.now().date().isoformat()
-    
-#     conn = get_connection()
-#     c = conn.cursor()
-    
-#     try:
-#         c.execute("""
-#             UPDATE vocabulary 
-#             SET vi = %s, class = %s, examples_en = %s, examples_vi = %s, status = %s, date_added = %s 
-#             WHERE vocab_id = %s
-#         """, (new_meaning, new_class, new_examples_en, new_examples_vi, new_status,date_updated, vocab_id))
-#     except Exception as e:
-#         print(f"[LOG] Error updating vocabulary: {e}")
-#         conn.close()
-#         return False, str(e)
-    
-#     conn.commit()
-#     conn.close()
+# Lấy số lượng từ vựng được thêm vào trong 7 ngày gần đây và trả về dict dạng {ngày: số từ}, fill 0 nếu ngày không có
+def get_vocab_count_last_7_days(user_id: str) -> pd.DataFrame:
+    """
+    Trả về DataFrame gồm 2 cột: date, count – số từ thêm mỗi ngày trong 7 ngày gần đây.
 
-#     # log to check if the vocabulary was updated successfully
-#     print(f"[LOG] Vocabulary with ID {vocab_id} updated successfully.")
+    Args:
+        user_id (str): ID người dùng.
 
-#     return True, "Cập nhật từ vựng thành công!"
-    
+    Returns:
+        pd.DataFrame: Cột 'date' là datetime.date, 'count' là int.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+
+    today = datetime.now().date()
+    start_date = today - timedelta(days=6)
+
+    # Query: lấy số từ mỗi ngày gần đây
+    c.execute("""
+        SELECT date_added::date AS date, COUNT(*) AS count 
+        FROM vocabulary 
+        WHERE user_id = %s AND date_added >= %s 
+        GROUP BY date
+        ORDER BY date ASC
+    """, (user_id, start_date))
+
+    rows = c.fetchall()
+    conn.close()
+
+    # Chuyển thành dict tạm {ngày: count}
+    raw_counts = {row["date"]: row["count"] for row in rows}
+
+    # Tạo dataframe với đầy đủ 7 ngày, fill thiếu bằng 0
+    date_list = [start_date + timedelta(days=i) for i in range(7)]
+    data = {
+        "date": date_list,
+        "count": [raw_counts.get(day, 0) for day in date_list]
+    }
+
+    df = pd.DataFrame(data)
+    return df
+
+# lấy số lượng tử vựng đã nhớ/đang học và trả về dataframe
+def get_vocab_status_count(user_id: str) -> pd.DataFrame:
+    """
+    Trả về DataFrame gồm 2 cột: status, count – số lượng từ theo trạng thái.
+
+    Args:
+        user_id (str): ID người dùng.
+
+    Returns:
+        pd.DataFrame: Cột 'status' là str, 'count' là int.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+
+    # Query: lấy số lượng từ theo trạng thái
+    c.execute("""
+        SELECT status, COUNT(*) AS count 
+        FROM vocabulary 
+        WHERE user_id = %s 
+        GROUP BY status
+    """, (user_id,))
+
+    rows = c.fetchall()
+    conn.close()
+
+    # Chuyển thành DataFrame
+    df = pd.DataFrame(rows, columns=["status", "count"])
+    return df
+
