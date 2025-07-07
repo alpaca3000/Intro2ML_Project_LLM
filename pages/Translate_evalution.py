@@ -11,7 +11,7 @@ nltk.download('punkt')
 
 # Đường dẫn đến mô hình trong thư mục Downloads
 import os
-MODEL_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "my_en_vi_translation_model_archive")  
+MODEL_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "best_model")  
 # Tải mô hình (cache để tăng tốc)
 @st.cache_resource
 def load_model():
@@ -92,6 +92,8 @@ if st.session_state.show_result:
     percent = st.session_state.percentage_correct
     if percent >= 80:
         st.success(f"✅ Bản dịch của bạn chính xác {percent:.2f}%")
+    elif percent >= 50:
+        st.warning(f"⚠️ Bản dịch của bạn đạt {percent:.2f}% (chấp nhận được về mặt nghĩa).")
     else:
         st.error(f"🚫 Bản dịch của bạn chỉ chính xác {percent:.2f}%.")
 
