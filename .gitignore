@@ -33,3 +33,6 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# thư mục models vì có kích thước lớn
+models/
