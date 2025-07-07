@@ -84,23 +84,28 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 ## 🗂️ Cấu trúc project
 ```
     Envichan/
-    ├── Home.py                   # Trang chủ
-    ├── pages/                    # Các trang trong ứng dụng
-    │   ├── My_account.py         # Quản lý tài khoản
-    │   ├── My_dictionary.py      # Từ điển cá nhân
-    │   ├── My_flashcard.py       # Quản lý flashcard
+    ├── app.py                     # Định đạng thanh điều hướng tới các trang
+    ├── pages/                     # Các trang trong ứng dụng
+    |   ├── Home.py                # Trang chủ
+    │   ├── My_account.py          # Quản lý tài khoản
+    │   ├── My_dictionary.py       # Từ điển cá nhân
+    │   ├── My_flashcard.py        # Quản lý flashcard
     │   └── Translate_evalution.py # Đánh giá dịch thuật
-    ├── services/                 # Các dịch vụ của ứng dụng
-    │   ├── auth.py               # Xác thực người dùng
-    │   ├── flashcard.py          # Quản lý flashcard
-    │   ├── translate.py          # Dịch thuật
-    │   └── vocab.py              # Quản lý từ vựng
-    ├── components/               # Thành phần UI
-    │   └── flashcard_ui.py       # Giao diện flashcard
+    ├── services/                  # Các dịch vụ của ứng dụng
+    │   ├── auth.py                # Xác thực người dùng
+    │   ├── flashcard.py           # Quản lý flashcard
+    │   ├── vocab.py               # Quản lý từ điển 
+    │   ├── word_info.py           # Thông tin từ vựng
+    |   ├── translate.py           # Dịch thuật và đánh giá bản dịch
+    │   └── vocab.py               # Quản lý từ vựng
+    ├── components/                # Thành phần UI
+    │   ├── feedback.py            # Modal popup cho thông báo xác nhận
+    │   ├── index.html.py          # Giao diện flip-card của flashcard
+    │   └── flashcard_ui.py        # Giao diện flashcard
     ├── databases/ 
-    │   └── connection.py         # Kết nối DB
-    ├── utils/                    # Tiện ích
-    │   ├── password.py           # Mã hóa password
-    │   └── session.py            # Quản lý phiên
-    └── requirements.txt          # Thư viện cần thiết
+    │   └── connection.py          # Kết nối DB
+    ├── utils/                     # Tiện ích
+    │   ├── password.py            # Mã hóa password
+    │   └── session.py             # Quản lý phiên
+    └── requirements.txt           # Thư viện cần thiết
 ```
