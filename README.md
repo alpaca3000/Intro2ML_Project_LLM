@@ -7,10 +7,11 @@ Envichan là một ứng dụng học tiếng Anh trực tuyến xây dựng tr�
 ## 🚀 Tính năng chính
 
 - **Dịch thuật**: Dịch văn bản từ tiếng Anh sang tiếng Việt sử dụng mô hình AI tiên tiến
+- **Tra cứu từ vựng**: Tra cứu định nghĩa của từ
 - **Từ điển cá nhân**: Thêm, chỉnh sửa và quản lý danh sách từ vựng của bạn
 - **Flashcard**: Tạo và luyện tập với các bộ thẻ flashcard từ từ vựng đã lưu
 - **Đánh giá dịch thuật**: So sánh bản dịch của bạn với bản dịch của hệ thống
-- **Quản lý tài khoản**: Hệ thống đăng ký, đăng nhập người dùng
+- **Quản lý tài khoản**: Hệ thống đăng ký, đăng nhập người dùng, hiển thị thông tin tiến độ học tập
 
 ## 🧠 Mô hình sử dụng
 
@@ -40,15 +41,15 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
    ```
 3. Cài đặt từ điển WordNet:
    ```bash
-   python -m nltk.downloader wordnet
+   python -m nltk.downloader wordnet punkt
    ```  
 4. Chạy ứng dụng
    ```bash
-   streamlit run Home.py
+   streamlit run app.py
    ``` 
    hoặc
    ```bash
-   streamlit run Home.py --server.headless true
+   streamlit run app.py --server.headless true
    ```
 
 ### Hướng dẫn sử dụng
@@ -61,6 +62,8 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 
 - Đăng ký tài khoản mới
 - Đăng nhập vào hệ thống
+- Xem tiến độ học tập
+- Đăng xuất
 
 3. Từ điển của tôi:
 
@@ -71,6 +74,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
 
 - Tạo bộ flashcard mới từ từ vựng đã lưu
 - Luyện tập với các bộ flashcard
+- Xóa flashcard
 
 5. Đánh giá dịch thuật:
 
