@@ -22,6 +22,7 @@ def load_translation_model():
         st.error(f"Error loading model from {model_path}: {e}. Please ensure the model is accessible (e.g., online or downloaded).")
         st.stop()
 
+@st.cache_data
 def translate_text(text: str) -> str:
     """
     Translates English text to Vietnamese using a pre-trained translation model.
@@ -34,32 +35,22 @@ def translate_text(text: str) -> str:
         return "Không có văn bản để dịch."
     
     tokenizer, model = load_translation_model()
-    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=128)  # Giảm max_length để tối ưu
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=64).to(model.device)
     with torch.no_grad():
-        outputs = model.generate(**inputs, max_length=128, num_beams=5, early_stopping=True)
+        outputs = model.generate(**inputs, max_length=64, num_beams=3, early_stopping=True)  # Giảm beams
     translated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return translated_text
 
+@st.cache_data
 def evaluate_translation(original_text: str, user_translated_text: str):
-    """
-    Evaluates the quality of a translation using BERTScore.
-    Args:
-        original_text (str): The original text in English.
-        user_translated_text (str): The translated text in Vietnamese by user.
-    Returns:
-        tuple: (percentage_correct, machine_translation, comparison)
-    """
     if not original_text or not user_translated_text or not original_text.strip() or not user_translated_text.strip():
         return 0.0, "Không có văn bản để so sánh.", "No comparison available."
 
-    tokenizer, model = load_translation_model()
     machine_translation = translate_text(original_text)
     
-    # Tính BERTScore
-    P, R, F1 = score([user_translated_text], [machine_translation], lang="vi", model_type="bert-base-multilingual-cased")
-    percent = F1.mean().item() * 100  # Chuyển thành phần trăm
+    P, R, F1 = score([user_translated_text], [machine_translation], lang="vi", model_type="distilbert-base-multilingual-cased")
+    percent = F1.mean().item() * 100
 
-    # Đánh giá dựa trên BERTScore
     if percent >= 80:
         comparison = "User translation is highly accurate."
     elif percent >= 50:
@@ -68,7 +59,7 @@ def evaluate_translation(original_text: str, user_translated_text: str):
         comparison = "Machine translation is more accurate."
 
     return percent, machine_translation, comparison
-
+    
 def save_translation_history(user_id, original_text, user_translation, machine_translation, score):
     """
     Placeholder for saving translation history to database.
