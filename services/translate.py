@@ -44,6 +44,14 @@ def translate_text(text: str) -> str:
 
 @st.cache_data
 def evaluate_translation(original_text: str, user_translated_text: str):
+     """
+    Evaluates the quality of a translation using BERTScore.
+    Args:
+        original_text (str): The original text in English.
+        user_translated_text (str): The translated text in Vietnamese by user.
+    Returns:
+        tuple: (percentage_correct, machine_translation, comparison)
+    """
     if not original_text or not user_translated_text or not original_text.strip() or not user_translated_text.strip():
         return 0.0, "Không có văn bản để so sánh.", "No comparison available."
 
