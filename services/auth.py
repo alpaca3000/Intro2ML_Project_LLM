@@ -1,55 +1,16 @@
 import uuid
-import sqlite3
+from psycopg2 import Error
+from utils.password import hash_password, verify_password
+from databases.connection import get_connection
 
-def get_connection():
-    """
-    Establishes a connection to the SQLite database.
-    
-    Returns:
-        sqlite3.Connection: A connection object to the database.
-    """
-    return sqlite3.connect("databases/database.db")
-
-def check_user_exists(conn, username: str) -> bool:
-    """
-    Checks if a user with the given username exists in the database.
-    
-    Args:
-        conn (sqlite3.Connection): The connection object to the database.
-        username (str): The username to check.
-    
-    Returns:
-        bool: True if the user exists, False otherwise.
-    """
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username = ?", (username,))
-    username = c.fetchone()
-    return username is not None
-
-def check_email_exists(conn, email: str) -> bool:
-    """
-    Checks if an email already exists in the database.
-    
-    Args:
-        conn (sqlite3.Connection): The connection object to the database.
-        email (str): The email to check.
-    
-    Returns:
-        bool: True if the email exists, False otherwise.
-    """
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE email = ?", (email,))
-    email = c.fetchone()
-    return email is not None
-
-def add_user_to_db(conn, username: str, password: str, email: str) -> bool:
+def add_user_to_db(conn, username: str, hashed_password: str, email: str) -> bool:
     """
     Adds a new user to the database.
     
     Args:
         conn (sqlite3.Connection): The connection object to the database.
         username (str): The username of the new user.
-        password (str): The password of the new user.
+        hashed_password (str): The hashed password of the new user.
         email (str): The email of the new user.
     
     Returns:
@@ -58,13 +19,13 @@ def add_user_to_db(conn, username: str, password: str, email: str) -> bool:
     user_id = str(uuid.uuid4())
     
     try:
-        c = conn.cursor()
-        c.execute("""
-            INSERT INTO users (user_id, username, password, email)
-            VALUES (?, ?, ?, ?)
-        """, (user_id, username, password, email))
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO users (user_id, username, password, email)
+                VALUES (%s, %s, %s, %s)
+            """, (user_id, username, hashed_password, email))
         return True
-    except sqlite3.IntegrityError as e:
+    except Exception as e:
         print(f"[ERROR] Failed to add user: {e}")
         return False
 
@@ -80,23 +41,35 @@ def register_user(username: str, password: str, email: str) -> str:
     Returns:
         bool: True if registration is successful, False otherwise.
     """
-    # Placeholder for actual registration logic
-    # kiểm tra tên người dùng đã tồn tại, nếu đã tồn tại thì tra
+
     conn = get_connection()
     message = ""
     result = False
 
-    try: 
-        if check_user_exists(conn, username):
-            message = "Tên người dùng đã tồn tại! Vui lòng chọn tên khác."
-        elif check_email_exists(conn, email):
-            message = "Email đã được sử dụng! Vui lòng sử dụng email khác."
-        else:
-            add_user_to_db(conn, username, password, email)
-            conn.commit()
-            message = "susscess"
-            result = True
-    except sqlite3.Error as e:
+    try:
+        with conn.cursor() as cur:
+            # Kiểm tra username
+            cur.execute("SELECT 1 FROM users WHERE username = %s", (username,))
+            if cur.fetchone():
+                message = "Tên người dùng đã tồn tại! Vui lòng chọn tên khác."
+                return False, message
+
+            # Kiểm tra email
+            cur.execute("SELECT 1 FROM users WHERE email = %s", (email,))
+            if cur.fetchone():
+                message = "Email đã được sử dụng! Vui lòng sử dụng email khác."
+                return False, message
+
+            # Hash password và thêm vào DB
+            hashed_password = hash_password(password)
+            if add_user_to_db(conn, username, hashed_password, email):
+                conn.commit()
+                result = True
+                message = "success"
+            else:
+                message = "Không thể thêm người dùng vào cơ sở dữ liệu."
+
+    except Error as e:
         message = f"Lỗi khi đăng ký người dùng: {e}"
         print(f"[ERROR] {message}")
     finally:
@@ -121,7 +94,7 @@ def login_user(username: str, password: str):
     c = conn.cursor()
 
     # Kiểm tra tồn tại username
-    c.execute("SELECT user_id, password FROM users WHERE username = ?", (username,))
+    c.execute("SELECT user_id, password FROM users WHERE username = %s", (username,))
     row = c.fetchone()
     conn.close()
     result = False
@@ -130,10 +103,10 @@ def login_user(username: str, password: str):
     if row is None:
         message = "Tên người dùng không tồn tại."
     
-    user_id_db, password_db = row
+    user_id_db, password_db = row["user_id"], row["password"]
 
-    if password != password_db:
-        message = "Mật khẩu không đúng."
+    if not verify_password(password, password_db):
+        message = f"Mật khẩu không đúng."
     else:
         result = True
         message = user_id_db
