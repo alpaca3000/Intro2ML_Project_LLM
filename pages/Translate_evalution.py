@@ -1,5 +1,5 @@
 import streamlit as st
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM  # Cập nhật import
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM  
 from nltk.corpus import wordnet
 import nltk
 from services.translate import save_translation_history, evaluate_translation
