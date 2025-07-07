@@ -13,6 +13,7 @@ def load_translation_model():
         model: The pre-trained translation model.
     """
     model_path = "alpaca3000/en-vi-translation-model"  
+    # model_path = "models/my_en_vi_translation_model_archive"
     try:
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
