@@ -2,6 +2,8 @@ import streamlit as st
 import time
 from services.auth import register_user, login_user
 from utils.session import is_logged_in
+from services.charts import *
+from services.flashcard import get_flashcard_hisrory
 
 # --- Callback Functions cho trang Tài khoản của tôi---
 def show_register():
@@ -35,10 +37,53 @@ for key, value in {
 
 # --- Nếu đã đăng nhập ---
 if is_logged_in():
-    st.markdown(f"## Xin chào {st.session_state.username}!")
-    st.write("Đây là trang thông tin của bạn.")
+    # st.markdown(f"## Xin chào {st.session_state.username}!")
+    # st.write("Đây là trang thông tin của bạn.")
+    st.write(f"Chào mừng {st.session_state.username} trở lại! Đây là trang thông tin tiến độ học tập của bạn.")
     st.sidebar.title(f"Xin chào {st.session_state.username}!")
 
+    user_id = st.session_state.get("user_id")
+    
+
+    st.subheader("Lịch sử thêm từ")
+    fig = plot_vocab_added_last_7_days(user_id)
+    st.plotly_chart(fig, use_container_width=True)
+
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.subheader("Biểu đồ từ vựng")
+        fig = plot_vocab_status_distribution(user_id=user_id)
+        st.plotly_chart(fig, use_container_width=True)
+
+    with col2:
+        st.subheader("Biểu đồ flashcard")
+        fig = plot_flashcard_status_distribution(user_id=user_id)
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("Biểu đồ điểm số flashcard")
+    tab1, tab2 = st.tabs(["Biểu đồ", "Bảng dữ liệu"])
+    history = get_flashcard_hisrory(user_id)
+    with tab1:
+        fig = plot_single_score_line(history)
+        st.plotly_chart(fig, use_container_width=True)
+    with tab2:
+        if history.empty:
+            st.write("Bạn chưa làm flashcard nào.")
+        else:
+            history["time_updated"] = history["time_updated"].dt.strftime("%d/%m/%Y %H:%M:%S")
+            def color_row(row):
+                if row["score"] == 100.0:
+                    return ['background-color: #d4edda'] * len(row)
+                elif row["score"] < 50.0:
+                    return ['background-color: #f8d7da'] * len(row)
+                else:
+                    return [''] * len(row)
+
+            styled_df = history.style.apply(color_row, axis=1)
+            st.dataframe(styled_df, use_container_width=True)
+
+    
+    st.markdown("---")
     st.button("Đăng xuất", use_container_width=True, icon="🚪", on_click=logout)
     time.sleep(1)
 
