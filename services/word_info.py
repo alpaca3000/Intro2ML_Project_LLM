@@ -1,4 +1,5 @@
 import nltk
+from utils import nltk_config
 from nltk.corpus import wordnet
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM

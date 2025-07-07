@@ -41,7 +41,7 @@ Envichan sử dụng mô hình dịch thuật được huấn luyện trước t
    ```
 3. Cài đặt từ điển WordNet:
    ```bash
-   python -m nltk.downloader wordnet punkt
+   python -m nltk.downloader wordnet
    ```  
 4. Chạy ứng dụng
    ```bash

@@ -2,8 +2,9 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 import streamlit as st
 from bert_score import score
-from nltk.corpus import wordnet
 import nltk
+from utils import nltk_config
+from nltk.corpus import wordnet
 
 @st.cache_resource(show_spinner="Đang tải mô hình dịch thuật...")
 def load_translation_model():
