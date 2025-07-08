@@ -2,13 +2,14 @@ import os
 import streamlit as st
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-# Load biến môi trường từ .env
-load_dotenv()
+# # Load biến môi trường từ .env
+# load_dotenv()
 
-# Đọc connection string từ biến môi trường
-DATABASE_URL = os.getenv("DATABASE_URL")
+# # Đọc connection string từ biến môi trường
+# DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = st.secrets.get("DATABASE_URL", os.getenv("DATABASE_URL"))
 
 # @st.cache_resource
 def get_connection():
