@@ -55,7 +55,7 @@ def plot_vocab_added_last_7_days(user_id: str):
             y=df["count"],
             #text=df["count"],  # hiển thị số trên đầu cột
             textposition='outside',
-            marker_color="#3498db",
+            marker_color="#c09037",
             hovertemplate="%{x} <br>Số từ: %{y}<extra></extra>"
         )
     ])
@@ -95,7 +95,7 @@ def plot_vocab_status_distribution(user_id: str):
             hole=0.6,
             textinfo='label+percent',
             insidetextorientation='radial',
-            marker=dict(colors=["#f39c12", "#2ecc71"])
+            marker=dict(colors=["#FFA755", "#34C38F"])
         )
     ])
 
@@ -122,7 +122,7 @@ def plot_flashcard_status_distribution(user_id: str):
             hole=0.6,
             textinfo='label+percent',
             insidetextorientation='radial',
-            marker=dict(colors=["#e74c3c", "#8e44ad"])
+            marker=dict(colors=["#6C7A8370", "#0A73B4D1"])
         )
     ])
 
